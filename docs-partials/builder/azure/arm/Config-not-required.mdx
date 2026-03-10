@@ -247,6 +247,11 @@
   containing the virtual network. If the resource group cannot be found, or
   it cannot be disambiguated, this value should be set.
 
+- `disk_controller_type` (string) - Set the disk controller type for the build VM. Valid values are `SCSI`
+  and `NVMe`. `NVMe` requires a VM size that
+  [supports NVMe](https://learn.microsoft.com/en-us/azure/virtual-machines/nvme-overview).
+  Defaults to unset (Azure decides based on VM size).
+
 - `custom_data_file` (string) - Specify a file containing custom data to inject into the cloud-init
   process. The contents of the file are read and injected into the ARM
   template. The custom data will be passed to cloud-init for processing at
