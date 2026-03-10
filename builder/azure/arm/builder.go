@@ -162,7 +162,7 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 	if b.config.isManagedImage() {
 		// Skip the resource group existence check if the managed image resource group
 		// is the same as the temporary resource group, since it will be created during the build.
-		if b.config.ManagedImageResourceGroupName != b.config.tmpResourceGroupName {
+		if !strings.EqualFold(b.config.ManagedImageResourceGroupName, b.config.tmpResourceGroupName) {
 			groupId := commonids.NewResourceGroupID(b.config.ClientConfig.SubscriptionID, b.config.ManagedImageResourceGroupName)
 			_, err := azureClient.ResourceGroupsClient.Get(builderPollingContext, groupId)
 			if err != nil {
@@ -243,6 +243,7 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 
 		blobPrimaryEndpoint := *account.Properties.PrimaryEndpoints.Blob
 		b.config.storageAccountBlobEndpoint = blobPrimaryEndpoint
+		b.stateBag.Put(constants.ArmStorageAccountLocation, account.Location)
 		// Remove trailing slash
 		azureClient.GiovanniBlobClient.Client.BaseUri = blobPrimaryEndpoint[:len(blobPrimaryEndpoint)-1]
 	}
@@ -781,6 +782,6 @@ func (b *Builder) getVHDArtifact(vhdArtifact *VHDArtifact) {
 		vhdArtifact.AdditionalDisks = &dataDisks
 	}
 
-	vhdArtifact.StorageAccountLocation = b.config.Location
+	vhdArtifact.StorageAccountLocation = b.stateBag.Get(constants.ArmStorageAccountLocation).(string)
 	vhdArtifact.OSDiskUri = vhdUri
 }
